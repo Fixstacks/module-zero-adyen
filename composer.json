@@ -2,7 +2,7 @@
     "name": "fixstacks/module-zero-adyen",
     "description": "Zero for Magento Open Source: payment on Adyen's hosted page for Zero Checkout: cards, wallets and every local method switched on in the Adyen account; HMAC-signed webhooks.",
     "type": "magento2-module",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
