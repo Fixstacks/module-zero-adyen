@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+    Copyright © 2026 Roman Pasichnyk
+    SPDX-License-Identifier: OSL-3.0 OR AFL-3.0
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="zero_adyen" translate="label comment" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Adyen (Zero)</label>
+                <comment><![CDATA[Payment on Adyen's hosted page (a payment link). In the Adyen Customer Area: an API credential with the Checkout API (Developers > API credentials), and a Standard webhook to https://your-shop/zero_adyen/payment/webhook/ with an HMAC key (Developers > Webhooks). The account should capture automatically (Adyen's default).]]></comment>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" canRestore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Title</label>
+                </field>
+                <field id="merchant_account" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1">
+                    <label>Merchant Account</label>
+                </field>
+                <field id="api_key" translate="label" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1">
+                    <label>API Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="hmac_key" translate="label comment" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1">
+                    <label>Webhook HMAC Key</label>
+                    <comment>The hex key generated for the webhook. Webhooks with another signature are refused.</comment>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="test_mode" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" canRestore="1">
+                    <label>Test Mode</label>
+                    <comment>The test environment (checkout-test.adyen.com). Turn off with the live account's credentials.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="live_prefix" translate="label comment" type="text" sortOrder="70" showInDefault="1" showInWebsite="1">
+                    <label>Live URL Prefix</label>
+                    <comment>Customer Area > Developers > API URLs: the part before -checkout-live.adyenpayments.com.</comment>
+                    <depends><field id="test_mode">0</field></depends>
+                </field>
+                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="80" showInDefault="1" showInWebsite="1" canRestore="1">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="90" showInDefault="1" showInWebsite="1">
+                    <label>Payment from Specific Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" canRestore="1">
+                    <label>Sort Order</label>
+                    <validate>validate-number</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
