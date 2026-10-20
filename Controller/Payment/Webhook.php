@@ -15,18 +15,19 @@ use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Raw;
 use Magento\Framework\Controller\Result\RawFactory;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Model\OrderFactory;
 use Psr\Log\LoggerInterface;
 use Zero\Adyen\Model\Api;
 use Zero\Adyen\Model\Notification;
-use Zero\Adyen\Model\OrderUpdater;
 use Zero\Adyen\Model\Payment;
+use Zero\Checkout\Model\RedirectPayment\Webhooks;
 
 /**
  * Adyen's standard webhook (zero_adyen/payment/webhook, HMAC): each item's
  * signature is checked with the order's store key; a successful AUTHORISATION
- * marks the order paid (OrderUpdater). Answers "[accepted]", or 401 on a bad
- * signature.
+ * marks the order paid (OrderUpdater, now or from the queue: Zero Checkout >
+ * Payment Webhooks). Answers "[accepted]", or 401 on a bad signature.
  */
 class Webhook implements HttpPostActionInterface, CsrfAwareActionInterface
 {
@@ -35,7 +36,7 @@ class Webhook implements HttpPostActionInterface, CsrfAwareActionInterface
         private readonly RawFactory $rawFactory,
         private readonly OrderFactory $orderFactory,
         private readonly Api $api,
-        private readonly OrderUpdater $orderUpdater,
+        private readonly Webhooks $webhooks,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -61,8 +62,10 @@ class Webhook implements HttpPostActionInterface, CsrfAwareActionInterface
 
                 return $result->setHttpResponseCode(401)->setContents('');
             }
-            if (($item['eventCode'] ?? '') === 'AUTHORISATION' && ($item['success'] ?? '') === 'true') {
-                $this->orderUpdater->authorised($order, $item);
+            try {
+                $this->webhooks->handle($order, $item);
+            } catch (LocalizedException) {
+                return $result->setHttpResponseCode(503)->setContents('');
             }
         }
 

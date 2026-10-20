@@ -13,6 +13,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Zero\Checkout\Model\RedirectPayment\OrderPayment;
 use Zero\Checkout\Model\RedirectPayment\ReturnResult;
+use Zero\Checkout\Model\RedirectPayment\WebhookHandlerInterface;
 
 /**
  * Brings an order in line with Adyen, from two sides:
@@ -23,7 +24,7 @@ use Zero\Checkout\Model\RedirectPayment\ReturnResult;
  *   payment's pspReference (refunds need it).
  * Whichever comes first marks the order paid; the other changes nothing.
  */
-class OrderUpdater
+class OrderUpdater implements WebhookHandlerInterface
 {
     public function __construct(
         private readonly Api $api,
@@ -68,6 +69,19 @@ class OrderUpdater
             $this->paid($order, (array) ($item['amount'] ?? []), $pspReference);
         } else {
             $this->orderRepository->save($order);
+        }
+    }
+
+    /**
+     * The verified webhook item (Controller\Payment\Webhook, now or from
+     * the queue): a successful AUTHORISATION marks the order paid.
+     *
+     * @inheritDoc
+     */
+    public function webhook(Order $order, array $data): void
+    {
+        if (($data['eventCode'] ?? '') === 'AUTHORISATION' && ($data['success'] ?? '') === 'true') {
+            $this->authorised($order, $data);
         }
     }
 

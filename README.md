@@ -36,6 +36,8 @@ Part of [`fixstacks/zero`](https://fixstacks.com/zero), which installs the Zero 
    asked from Adyen: completed (paid), paymentPending, expired (cancelled),
    active (nobody paid: the link is expired, the order cancelled, the cart
    restored).
+   Handled now or from the queue: Zero Checkout > Payment Webhooks
+   (the Zero_Checkout README).
 
 The account should **capture automatically** (Adyen's default): an
 authorised payment counts as paid. **Refunds:** credit memos refund online
