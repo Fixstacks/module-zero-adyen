@@ -1,4 +1,4 @@
-# fixstacks/module-zero-adyen — licensing
+# zerofront/module-zero-adyen — licensing
 
 Copyright © 2026 Roman Pasichnyk.
 
